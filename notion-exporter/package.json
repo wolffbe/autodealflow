@@ -1,0 +1,11 @@
+{
+  "name": "notion-exporter",
+  "version": "0.0.1",
+  "type": "module",
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "dotenv": "^16.4.7",
+    "ioredis": "^5.5.0",
+    "winston": "^3.17.0"
+  }
+}

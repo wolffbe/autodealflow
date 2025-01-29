@@ -1,0 +1,95 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - network
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+
+  inbox:
+    build:
+      context: inbox
+    container_name: inbox
+    depends_on:
+      - redis
+    environment:
+      - LOG_LEVEL=${MAILBOX_LOG_LEVEL}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - IMAP_SERVER=${IMAP_SERVER}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - OPP_CH=${OPP_CH}
+      - IMBOX_CONFIG=${IMBOX_CONFIG}
+      - ATTACHMENTS_DIR=${ATTACHMENTS_DIR}
+      - POLLING_INTERVAL=${POLLING_INTERVAL}
+    networks:
+      - network
+    volumes:
+      - attachments:/attachments
+  opp-analysis:
+    build:
+      context: opp-analysis
+    container_name: opp-analysis
+    depends_on:
+      - redis
+    environment:
+      - LOG_LEVEL=${OPP_ANALYSIS_LOG_LEVEL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - OPP_CH=${OPP_CH}
+      - ORACLE_CH=${ORACLE_CH}
+      - NOTION_EXPORT_CH=${NOTION_EXPORT_CH}
+      - THESIS=${THESIS}
+      - IS_OPP_PROMPT_PATH=${IS_OPP_PROMPT_PATH}
+      - OPP_PROMPT_PATH=${OPP_PROMPT_PATH}
+      - OPP_FIELDS=${OPP_FIELDS}
+    networks:
+      - network
+    volumes:
+      - attachments:/attachments
+
+  oracle:
+    build:
+      context: oracle
+    container_name: oracle
+    depends_on:
+      - redis
+    environment:
+      - LOG_LEVEL=${ORACLE_LOG_LEVEL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - ORACLE_CH=${ORACLE_CH}
+      - OPP_CH=${OPP_CH}
+      - OPEN_AI_KEY=${OPEN_AI_KEY}
+      - OPEN_AI_MODEL=${OPEN_AI_MODEL}
+    networks:
+      - network
+
+  notion-exporter:
+    build:
+      context: notion-exporter
+    container_name: notion-exporter
+    depends_on:
+      - redis
+    environment:
+      - LOG_LEVEL=${NOTION_EXPORTER_LOG_LEVEL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - NOTION_EXPORT_CH=${NOTION_EXPORT_CH}
+      - NOTION_API_KEY=${NOTION_API_KEY}
+      - NOTION_DB_PARENT_PAGE_ID=${NOTION_DB_PARENT_PAGE_ID}
+      - OPP_FIELDS=${OPP_FIELDS}
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge
+
+volumes:
+  attachments:

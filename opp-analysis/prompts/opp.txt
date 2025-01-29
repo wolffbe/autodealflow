@@ -1,0 +1,13 @@
+Generate a JSON object based on the fields provided in OPP_FIELDS.
+Directly from the following email and its attachments EMAIL.
+
+For each field:
+
+    If the field corresponds to a specific detail in the email (e.g., sender, subject, date, body text), quote that information directly from the email.
+    If the field corresponds to data found in an attachment, quote the relevant key details from the attachment(s).
+    If a field is missing, not applicable, or cannot be determined from the given data, set its value to unclear. Do not use arrays—each field must contain a single value. You may add multiple quotes.
+    Ensure all opportunity fields are present in the output JSON, even if their values are unclear.
+
+Return an unformatted JSON object strictly following this structure.
+Do not omit any fields, and do not use arrays within the fields.
+Do not add any "```json" in your response.
